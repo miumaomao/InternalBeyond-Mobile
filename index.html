@@ -3939,6 +3939,8 @@ self.addEventListener(&#x27;fetch&#x27;,function(e){
         <div class="f-group"><label>常用模型 <span class="lb-note">（选一个即填入模型栏并保存）</span></label><div class="sel"><select id="vt-mpre"><option value="">— 自定义 —</option><optgroup label="OpenAI"><option value="gpt-4o-mini-transcribe" data-pv="openai" data-ep="https://api.openai.com/v1">gpt-4o-mini-transcribe</option><option value="gpt-4o-transcribe" data-pv="openai" data-ep="https://api.openai.com/v1">gpt-4o-transcribe</option><option value="whisper-1" data-pv="openai" data-ep="https://api.openai.com/v1">whisper-1</option></optgroup><optgroup label="千问 · 阿里云百炼"><option value="qwen3-asr-flash" data-pv="ali" data-ep="https://dashscope.aliyuncs.com/compatible-mode/v1">qwen3-asr-flash（稳定版）</option><option value="qwen3-asr-flash-2026-02-10" data-pv="ali" data-ep="https://dashscope.aliyuncs.com/compatible-mode/v1">qwen3-asr-flash-2026-02-10（最新快照）</option><option value="qwen-audio-3.1-asr-flash" data-pv="ali" data-ep="https://dashscope.aliyuncs.com/compatible-mode/v1">qwen-audio-3.1-asr-flash（新 · 原生接口）</option><option value="qwen-audio-3.0-asr-flash" data-pv="ali" data-ep="https://dashscope.aliyuncs.com/compatible-mode/v1">qwen-audio-3.0-asr-flash（原生接口）</option><option value="fun-asr-flash-2026-06-15" data-pv="ali" data-ep="https://dashscope.aliyuncs.com/compatible-mode/v1">fun-asr-flash-2026-06-15（原生接口）</option><option value="qwen3-omni-flash" data-pv="ali" data-ep="https://dashscope.aliyuncs.com/compatible-mode/v1">qwen3-omni-flash（能听语气：笑 / 叹气 / 咳嗽）</option><option value="qwen3.5-omni-flash" data-pv="ali" data-ep="https://dashscope.aliyuncs.com/compatible-mode/v1">qwen3.5-omni-flash（能听语气）</option></optgroup><optgroup label="智谱"><option value="glm-asr-2512" data-pv="zhipu" data-ep="https://open.bigmodel.cn/api/paas/v4">glm-asr-2512（单段 30 秒内）</option></optgroup><optgroup label="硅基流动 SiliconFlow"><option value="FunAudioLLM/SenseVoiceSmall" data-pv="sf" data-ep="https://api.siliconflow.cn/v1">FunAudioLLM/SenseVoiceSmall（免费）</option><option value="TeleAI/TeleSpeechASR" data-pv="sf" data-ep="https://api.siliconflow.cn/v1">TeleAI/TeleSpeechASR（免费）</option></optgroup><optgroup label="Groq"><option value="whisper-large-v3-turbo" data-pv="groq" data-ep="https://api.groq.com/openai/v1">whisper-large-v3-turbo</option><option value="whisper-large-v3" data-pv="groq" data-ep="https://api.groq.com/openai/v1">whisper-large-v3</option></optgroup></select></div></div><!-- v178-p：①常用转写模型 -->
         <div class="f-group" style="margin-bottom:6px"><label>模型</label><input id="vt-model" placeholder="gpt-4o-mini-transcribe / qwen3-asr-flash / FunAudioLLM/SenseVoiceSmall …"></div>
         <div class="tog"><div class="tog-m"><div class="tog-t">语气声音与情绪（beta）</div><div class="tog-s">能听声音的模型（千问 Omni、自建 SenseVoice）转写时顺带标出笑、叹气、咳嗽、哭腔与情绪，并入发给 TA 的语气参考。</div></div><div class="sw2" id="vt-rich"></div></div><!-- v351-p -->
+        <!-- IB-MOSS-ASR-V1 -->
+        <div class="f-group"><button class="btn wide" id="vt-preset-mosi" type="button">一键用 MOSS 转写（免 Key · 同域代理）</button></div>
         <button class="btn wide primary" id="vt-save">保存</button>
         <p class="hint">选「常用模型」时，地址空着会自动填上；换到另一家的官方模型，地址跟着换；中转或自建的地址不动。多数服务走 OpenAI 兼容的 /audio/transcriptions（OpenAI、硅基流动、Groq、智谱 GLM-ASR）。千问分两路，都自动切换：qwen3-asr-flash 系列走百炼 compatible-mode 的 chat 音频输入；qwen-audio-3.x-asr-flash 与 fun-asr-flash 走百炼原生接口。Endpoint 填百炼地址（compatible-mode 那条也行），或直接沿用你的千问 API 配置。想让 TA 听出你笑了、叹气了，选千问 Omni（或自建带标签的 SenseVoice）并开着下面的「语气声音与情绪」。录音结束后把识别文字填进对话输入框；Key 留空表示未启用；与电脑版共用同一套设置。豆包语音识别不是 OpenAI 兼容协议，暂不支持。浏览器直连要对方允许跨域（CORS），不通就走自己的中转。iPhone 录下的是 m4a，千问 3-ASR 的格式表里没有它；iPhone 上识别失败时，换 qwen-audio-3.1-asr-flash 或别家。<!-- v330-p：常用模型按服务商分组、带默认地址 --></p>
       </div>
@@ -6337,7 +6339,7 @@ async function loadVT(force){
   _vtFromDb=ok;
   return _vt;
 }
-function vtReady(){return !!(_vt&&_vt.apiKey&&_vt.model)}
+function vtReady(){return !!(_vt&&_vt.model&&(_vt.apiKey||/\/ib-a83k2\/asr-mosi(?:\/|$)/.test(String(_vt.endpoint||''))))}/* IB-MOSS-ASR-V1：同域代理免 Key */
 async function loadMS(force){
   if(_ms&&!force)return _ms;
   let r=null,ok=false;try{r=await dbGet('apiSettings','memorySettings');ok=true}catch(e){ok=false}
@@ -9420,7 +9422,9 @@ async function vtTranscribeX(blob,mime){
     if(/^glm-asr/i.test(String(vt.model||'')))fd.append('stream','false');/* 手机端 v436：智谱 GLM-ASR 明说不要流式 */
     const ac=new AbortController();const tmr=setTimeout(()=>ac.abort(),30000);
     try{
-      const res=await fetch(vtUrl(vt.endpoint),{method:'POST',headers:{'Authorization':'Bearer '+vt.apiKey},body:fd,signal:ac.signal});
+      const _slAsrProxy=/\/ib-a83k2\/asr-mosi(?:\/|$)/.test(String(vt.endpoint||''));/* IB-MOSS-ASR-V1：Key 由 Caddy 注入，Bearer 会盖掉浏览器 Basic 凭据 */
+      const _slHdr=_slAsrProxy?{}:{'Authorization':'Bearer '+vt.apiKey};
+      const res=await fetch(vtUrl(vt.endpoint),{method:'POST',headers:_slHdr,body:fd,signal:ac.signal});
       clearTimeout(tmr);
       const t=await res.text();
       if(!res.ok)throw new Error('HTTP '+res.status+'：'+t.slice(0,120));
@@ -13814,6 +13818,15 @@ $('vt-save').addEventListener('click',async()=>{
     model:$('vt-model').value.trim()||'whisper-1'});
   try{await dbPut('apiSettings',upd);_vt=upd;toast('已保存')}catch(e){toast('保存失败')}
 });
+try{var _vpm=$('vt-preset-mosi');if(_vpm)_vpm.addEventListener('click',function(){
+  var _e=$('vt-ep'),_k=$('vt-key'),_m=$('vt-model');
+  if(_e)_e.value='/ib-a83k2/asr-mosi/v1';
+  if(_k)_k.value='';
+  if(_m)_m.value='moss-transcribe-1.0';
+  try{var _mp=$('vt-mpre');if(_mp)_mp.value='';var _vs=$('vt-src');if(_vs)_vs.value=''}catch(e){}
+  try{$('vt-save').click()}catch(e){}
+  setTimeout(function(){try{toast('已切到 MOSS 转写（免 Key）：Endpoint 填好、Key 留空，发段语音试试')}catch(e){}},450);
+})}catch(e){}/* IB-MOSS-ASR-V1 */
 async function testCfg(cfg){
   if(!cfg.apiKey)return{ok:false,err:'未填 Key'};
   const t0=Date.now();
